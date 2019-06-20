@@ -2,6 +2,7 @@
 #include "VL53L0X.h"
 
 // dingen comment do stuff
+// BRAAAAAAAAAAAAAAAAAAAAAAAAAANCCCCCCCCCCCCCCCCCCCCCCCHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
 /* 
    De MS1 MS2 en MS3 pins zijn om hlave stappen etc in te stellen, die gebruiken we dus niet want 1 stap is goed genoeg

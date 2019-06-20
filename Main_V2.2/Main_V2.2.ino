@@ -66,7 +66,7 @@
 #define maxRPM 40
 #define standaardRPM 30
 
-#define maxAfwijkingZij 8
+#define maxAfwijkingZij 20
 #define bochtAfwijkingZij 400
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120

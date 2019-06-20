@@ -480,7 +480,7 @@ void loop() {
 		  
 				if (afstandBoom < 200 && boomBezig == false){ // Als je een boom ziet die nog niet gezien is
 					boomTeller++;
-					//dobeep(beepboom);
+					dobeep(beepboom);
 				}
 				
 				if (afstandBoom > 200){	// Detecteer einde van een boom
@@ -497,6 +497,7 @@ void loop() {
 					bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking); // Bijstuurfunctie, gebruikt afstanden en verschil, past de snelheden aan
 				}
 				
+				/*
 				if (afstandZijkantVoor * afstandsFactorZijkant > zijkantAfstandOptimum + maxAfwijkingZij && bijstuurTimer == 0){ // Stuur bovendien 4 RPM bij afhankelijk van hoeveer de voorste sensor van de omkeping
 					RRPM += 4;
 					LRPM -= 4;
@@ -506,6 +507,7 @@ void loop() {
 					RRPM -= 4;
 					LRPM += 4;
 				}
+				*/
 				
 				
 				if ((afstandLinksVoor < medewerkerAfstand || afstandMiddenVoor < medewerkerAfstand || afstandRechtsVoor < medewerkerAfstand || stopTimer != 0) && bochtStatus == 0){  // Evil pseudocode of death, please replace
@@ -515,10 +517,10 @@ void loop() {
 					
 					if (stopTimer == 0){ // start timer als dit de eerste keer is
 						stopTimer = 1;
-						//dobeep(beeppersoon); // Beep naar de persoon
+						dobeep(beeppersoon); // Beep naar de persoon
 					}
 					if (stopTimer > 5000){ // als we al 5 seconden wachten, beep urgenter
-						//dobeep(beepPersoon2);
+						dobeep(beepPersoon2);
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					if (stopTimer > 15000){ // Als we al 15 seconden wachten, assume bug, assume muur, werkt nu niet, en kan misschien beter iets compleet anders zijn

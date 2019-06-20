@@ -335,10 +335,10 @@ void loop() {
 	if (!leesKnop(volgKnop)){ // Volgknop ingedrukt
 		delay(20);
 		if(!leesKnop(volgKnop)){ // Double check
-      /* test of de knop wel terug naar 0 gaat
+		
 			while(!leesKnop(volgKnop)){	// Zolang de knop ingedrukt is
 			}
-     */ 
+			
 			volgModus = !volgModus;		// toggle de waarde van volgModus
 			if (volgModus){
 				dobeep(beepvolgaan);	// doe de dingen voor de bijhorende nieuwe waarde van volgmodus
@@ -471,7 +471,6 @@ void loop() {
 
     case tellen:
 		if (!begonnen){	// Reset de RPM waardes bij het ingaan van deze case
-		  begonnen = true;
 		  RRPM = standaardRPM;
 		  LRPM = standaardRPM;
 		}
@@ -688,7 +687,8 @@ void loop() {
     
     case volgen:
 		if (!begonnen){ // als dit de eerste keer in de case is, initialiseer
-			while(afstandMiddenVoor > volgAfstand + maxAfwijkingZij){ // wacht tot medewerken op afstand is 
+			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is 
+			// HIER DINGEN VERANDERD< W@AS EEN WHILE N+LOOP< NU EEN IF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				begonnen = true;
 				RRPM = standaardRPM;
 				LRPM = standaardRPM;

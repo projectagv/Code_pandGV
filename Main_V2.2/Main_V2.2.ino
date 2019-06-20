@@ -132,8 +132,8 @@ VL53L0X sensor7;
 
 
 volatile float timerFlag = 0;
-int stapLTimer = 1;
-int stapRTimer = 1;
+float stapLTimer = 1;
+float stapRTimer = 1;
 float LRPM = 0;
 float RRPM = 0;
 int bijstuurTimer = 1;

@@ -496,7 +496,7 @@ void loop() {
 			
 				uint16_t afwijking = (sqrt(pow(afstandZijkantVoor - afstandZijkantAchter, 2))); // verschil tussen voor en achter absoluut
 				
-				if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0){ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms
+				if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0 && bochtStatus == 0);{ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms
 					bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking); // Bijstuurfunctie, gebruikt afstanden en verschil, past de snelheden aan
 				}
 				

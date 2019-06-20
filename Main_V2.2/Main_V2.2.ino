@@ -132,8 +132,8 @@ VL53L0X sensor7;
 
 
 volatile float timerFlag = 0;
-int stapLTimer = 1;
-int stapRTimer = 1;
+float stapLTimer = 1;
+float stapRTimer = 1;
 float LRPM = 0;
 float RRPM = 0;
 int bijstuurTimer = 1;
@@ -335,10 +335,10 @@ void loop() {
 	if (!leesKnop(volgKnop)){ // Volgknop ingedrukt
 		delay(20);
 		if(!leesKnop(volgKnop)){ // Double check
-      /* test of de knop wel terug naar 0 gaat
+		
 			while(!leesKnop(volgKnop)){	// Zolang de knop ingedrukt is
 			}
-     */ 
+			
 			volgModus = !volgModus;		// toggle de waarde van volgModus
 			if (volgModus){
 				dobeep(beepvolgaan);	// doe de dingen voor de bijhorende nieuwe waarde van volgmodus
@@ -471,7 +471,6 @@ void loop() {
 
     case tellen:
 		if (!begonnen){	// Reset de RPM waardes bij het ingaan van deze case
-		  begonnen = true;
 		  RRPM = standaardRPM;
 		  LRPM = standaardRPM;
 		}
@@ -496,7 +495,7 @@ void loop() {
 			
 				uint16_t afwijking = (sqrt(pow(afstandZijkantVoor - afstandZijkantAchter, 2))); // verschil tussen voor en achter absoluut
 				
-				if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0){ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms
+				if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0 && bochtStatus == 0);{ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms
 					bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking); // Bijstuurfunctie, gebruikt afstanden en verschil, past de snelheden aan
 				}
 				
@@ -688,7 +687,8 @@ void loop() {
     
     case volgen:
 		if (!begonnen){ // als dit de eerste keer in de case is, initialiseer
-			while(afstandMiddenVoor > volgAfstand + maxAfwijkingZij){ // wacht tot medewerken op afstand is 
+			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is 
+			// HIER DINGEN VERANDERD< W@AS EEN WHILE N+LOOP< NU EEN IF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				begonnen = true;
 				RRPM = standaardRPM;
 				LRPM = standaardRPM;

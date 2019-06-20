@@ -1,6 +1,8 @@
 #include <Wire.h>
 #include "VL53L0X.h"
 
+// dingen comment do stuff
+
 /* 
    De MS1 MS2 en MS3 pins zijn om hlave stappen etc in te stellen, die gebruiken we dus niet want 1 stap is goed genoeg
    Er moet een condensator van 47 microFarad tussen de Vmot(VMotor, motorvoeding), en de bijhorende GND

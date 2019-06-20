@@ -66,7 +66,7 @@
 #define maxRPM 40
 #define standaardRPM 30
 
-#define maxAfwijkingZij 8
+#define maxAfwijkingZij 10
 #define bochtAfwijkingZij 400
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
@@ -79,7 +79,7 @@
 #define aantalRotatiesPerGrade afgelegdeHoekPerRotatie/360
 #define aantalStappenPerGrade aantalRotatiesPerGrade * aantalStappenPerRotatie
 
-#define bijstuurTimerMax 150 // de timer die overschreden moet worden om opnieuw bij te sturen
+#define bijstuurTimerMax 400 // de timer die overschreden moet worden om opnieuw bij te sturen
 #define snelheidAfwijkingConstante 2  // het aantal rpm verandering dat we willen per afwijking in mm aan de zijkant
 #define volgAfstand 80  // de afstand tussen agv en volgpersoon
 #define boomafstand // de afstand tussen agv en boom voor tellen
@@ -201,7 +201,7 @@ void setup() {
   delay(10);
   sensorLinksVoor.setAddress(sensorI2C[0]);
   delay(10);
-  sensorLinksVoor.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorLinksVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[1], INPUT);
@@ -212,7 +212,7 @@ void setup() {
   delay(10);
   sensorMiddenVoor.setAddress(sensorI2C[1]);
   delay(10);
-  sensorMiddenVoor.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorMiddenVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[2], INPUT);
@@ -223,7 +223,7 @@ void setup() {
   delay(10);
   sensorRechtsVoor.setAddress(sensorI2C[2]);
   delay(10);
-  sensorRechtsVoor.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorRechtsVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[3], INPUT);
@@ -234,7 +234,7 @@ void setup() {
   delay(10);
   sensorZijkantVoor.setAddress(sensorI2C[3]);
   delay(10);
-  sensorZijkantVoor.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorZijkantVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[4], INPUT);
@@ -245,7 +245,7 @@ void setup() {
   delay(10);
   sensorBoom.setAddress(sensorI2C[4]);
   delay(10);
-  sensorBoom.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorBoom.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[5], INPUT);
@@ -256,7 +256,7 @@ void setup() {
   delay(10);
   sensorZijkantAchter.setAddress(sensorI2C[5]);
   delay(10);
-  sensorZijkantAchter.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
+  sensorZijkantAchter.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
 
 /*
@@ -301,7 +301,7 @@ void setup() {
   TCCR0B = 0;// same for TCCR0B
   TCNT0  = 0;//initialize counter value to 0
   // set compare match register for 1khz increments
-  OCR0A = 125;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms
+  OCR0A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms
   // turn on CTC mode
   TCCR0A |= (1 << WGM01);
   // Set CS01 and CS00 bits for 64 prescaler
@@ -315,6 +315,7 @@ void setup() {
   sensorZijkantVoor.startSensor();
 
   while(leesKnop(startKnop)){
+    updateSensoren();
   }
 }
 
@@ -334,8 +335,10 @@ void loop() {
 	if (!leesKnop(volgKnop)){ // Volgknop ingedrukt
 		delay(20);
 		if(!leesKnop(volgKnop)){ // Double check
+      /* test of de knop wel terug naar 0 gaat
 			while(!leesKnop(volgKnop)){	// Zolang de knop ingedrukt is
 			}
+     */ 
 			volgModus = !volgModus;		// toggle de waarde van volgModus
 			if (volgModus){
 				dobeep(beepvolgaan);	// doe de dingen voor de bijhorende nieuwe waarde van volgmodus
@@ -362,21 +365,21 @@ void loop() {
 		LRPM = 0;
 	}
 	
-	if (timerFlag){ //Als er minstens 1/2 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
+	if (timerFlag){ //Als er minstens 1/4 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
 		if (bijstuurTimer){
-			bijstuurTimer += timerFlag/2;
+			bijstuurTimer += timerFlag/4;
 			if (bijstuurTimer > bijstuurTimerMax){
 				bijstuurTimer = 0;
 			}
 		}
 		if (stapLTimer){
-			stapLTimer += timerFlag/2;
+			stapLTimer += timerFlag/4;
 		}
 		if (stapRTimer){
-			stapRTimer += timerFlag/2;
+			stapRTimer += timerFlag/4;
 		}
 		if (stopTimer){
-			stopTimer += timerFlag/2;
+			stopTimer += timerFlag/4;
 		}
 		timerFlag = 0;
 		// !!!!!!!!!!!!!!!!!! Double check of alle timers hier in staan, anders werken ze obviously niet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -388,7 +391,7 @@ void loop() {
 	  stapRTimer = 1;
   }
 
-  if (stapRTimer > (2000/((RRPM/60)*200))){ // verkeerd om, daarom low
+  if (stapRTimer > (1000/((RRPM/60)*200))){ // verkeerd om, daarom low
     digitalWrite(richtingPinR, LOW);
     digitalWrite(stapPinR, HIGH);
     stapRTimer = 1;
@@ -401,7 +404,7 @@ void loop() {
 	  stapLTimer = 1;
   }
   
-  if (stapLTimer > (2000/((LRPM/60)*200))){
+  if (stapLTimer > (1000/((LRPM/60)*200))){
     digitalWrite(richtingPinL, HIGH);
     digitalWrite(stapPinL, HIGH);
     stapLTimer = 1;
@@ -480,7 +483,7 @@ void loop() {
 		  
 				if (afstandBoom < 200 && boomBezig == false){ // Als je een boom ziet die nog niet gezien is
 					boomTeller++;
-					//dobeep(beepboom);
+					dobeep(beepboom);
 				}
 				
 				if (afstandBoom > 200){	// Detecteer einde van een boom
@@ -497,6 +500,7 @@ void loop() {
 					bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking); // Bijstuurfunctie, gebruikt afstanden en verschil, past de snelheden aan
 				}
 				
+				/*
 				if (afstandZijkantVoor * afstandsFactorZijkant > zijkantAfstandOptimum + maxAfwijkingZij && bijstuurTimer == 0){ // Stuur bovendien 4 RPM bij afhankelijk van hoeveer de voorste sensor van de omkeping
 					RRPM += 4;
 					LRPM -= 4;
@@ -506,6 +510,7 @@ void loop() {
 					RRPM -= 4;
 					LRPM += 4;
 				}
+				*/
 				
 				
 				if ((afstandLinksVoor < medewerkerAfstand || afstandMiddenVoor < medewerkerAfstand || afstandRechtsVoor < medewerkerAfstand || stopTimer != 0) && bochtStatus == 0){  // Evil pseudocode of death, please replace
@@ -515,10 +520,10 @@ void loop() {
 					
 					if (stopTimer == 0){ // start timer als dit de eerste keer is
 						stopTimer = 1;
-						//dobeep(beeppersoon); // Beep naar de persoon
+						dobeep(beeppersoon); // Beep naar de persoon
 					}
 					if (stopTimer > 5000){ // als we al 5 seconden wachten, beep urgenter
-						//dobeep(beepPersoon2);
+						dobeep(beepPersoon2);
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					if (stopTimer > 15000){ // Als we al 15 seconden wachten, assume bug, assume muur, werkt nu niet, en kan misschien beter iets compleet anders zijn

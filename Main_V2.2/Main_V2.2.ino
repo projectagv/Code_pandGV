@@ -66,7 +66,7 @@
 #define maxRPM 40
 #define standaardRPM 30
 
-#define maxAfwijkingZij 20
+#define maxAfwijkingZij 10
 #define bochtAfwijkingZij 400
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
@@ -79,7 +79,7 @@
 #define aantalRotatiesPerGrade afgelegdeHoekPerRotatie/360
 #define aantalStappenPerGrade aantalRotatiesPerGrade * aantalStappenPerRotatie
 
-#define bijstuurTimerMax 100 // de timer die overschreden moet worden om opnieuw bij te sturen
+#define bijstuurTimerMax 400 // de timer die overschreden moet worden om opnieuw bij te sturen
 #define snelheidAfwijkingConstante 2  // het aantal rpm verandering dat we willen per afwijking in mm aan de zijkant
 #define volgAfstand 80  // de afstand tussen agv en volgpersoon
 #define boomafstand // de afstand tussen agv en boom voor tellen
@@ -335,8 +335,10 @@ void loop() {
 	if (!leesKnop(volgKnop)){ // Volgknop ingedrukt
 		delay(20);
 		if(!leesKnop(volgKnop)){ // Double check
+      /* test of de knop wel terug naar 0 gaat
 			while(!leesKnop(volgKnop)){	// Zolang de knop ingedrukt is
 			}
+     */ 
 			volgModus = !volgModus;		// toggle de waarde van volgModus
 			if (volgModus){
 				dobeep(beepvolgaan);	// doe de dingen voor de bijhorende nieuwe waarde van volgmodus

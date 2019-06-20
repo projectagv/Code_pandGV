@@ -1,2 +1,2 @@
-# Code_pandGV
+# Code_pandAGV
 Code repository voor de pandAGV

@@ -399,7 +399,7 @@ void loop() {
     digitalWrite(richtingPinR, LOW);
     digitalWrite(stapPinR, HIGH);
     stapRTimer = 1;
-    delayMicroseconds(00);
+    delayMicroseconds(200);
     digitalWrite(stapPinR, LOW);
     aantalStappenR++;
   }

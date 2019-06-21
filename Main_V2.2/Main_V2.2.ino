@@ -300,17 +300,17 @@ void setup() {
   digitalWrite(enablePinR, LOW);
 
   // Instellen timerInterrupt op 1 ms
-  TCCR0A = 0;// set entire TCCR0A register to 0
-  TCCR0B = 0;// same for TCCR0B
-  TCNT0  = 0;//initialize counter value to 0
+  TCCR2A = 0;// set entire TCCR0A register to 0
+  TCCR2B = 0;// same for TCCR0B
+  TCNT2  = 0;//initialize counter value to 0
   // set compare match register for 1khz increments
-  OCR0A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms
+  OCR2A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms  
   // turn on CTC mode
-  TCCR0A |= (1 << WGM01);
+  TCCR2A |= (1 << WGM21);
   // Set CS01 and CS00 bits for 64 prescaler
-  TCCR0B |= (1 << CS01) | (1 << CS00);   
+  TCCR2B |= (1 << CS21) | (1 << CS20);   
   // enable timer compare interrupt
-  TIMSK0 |= (1 << OCIE0A);
+  TIMSK2 |= (1 << OCIE2A);
 
   sei();
   
@@ -705,171 +705,55 @@ void loop() {
   }
 }
 
-void dobeep(int8_t beepkeuze){
-	switch (beepkeuze){
-		case beeppersoon:
-	   // beep beep
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, LOW);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, LOW);
-		break;
-		
-		case beepvolgaan:
-			// beep beeeeeeeeeeeepppp
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, LOW);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(heel);
-		  digitalWrite(muziekpin1, LOW);
-		break;
-		
-		case beepvolguit:
-			// beeeeeeeeeeeeeeeeppp beep
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(heel);
-		  digitalWrite(muziekpin1, LOW);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, HIGH);
-		  delay(kwart);
-		  digitalWrite(muziekpin1, LOW);
-		break;
-		
-		case beepPersoon2:
-			// beep beep beep beep beep beep beep beep
-		  for(uint8_t i=0; i< 8; i++){
-			  digitalWrite(muziekpin1, HIGH);
-			  delay(kwart);
-			  digitalWrite(muziekpin1, LOW);
-			  delay(kwart);
-			}
-		break;
-		
-		case victoryBeep:
-			// Final fantasy tune
-			digitalWrite(muziekpin1, HIGH);
-			delay(zestiende);
-			digitalWrite(muziekpin1, LOW);
-			delay(zestiende);
-			digitalWrite(muziekpin1, HIGH);
-			delay(zestiende);
-			digitalWrite(muziekpin1, LOW);
-			delay(zestiende);
-			digitalWrite(muziekpin1, HIGH);
-			delay(zestiende);
-			digitalWrite(muziekpin1, LOW);
-			delay(zestiende);
-			digitalWrite(muziekpin1, HIGH);
-			delay(half);
-			digitalWrite(muziekpin1, LOW);
-			digitalWrite(muziekpin1, HIGH);
-			delay(half);
-			digitalWrite(muziekpin1, LOW);
-			digitalWrite(muziekpin1, HIGH);
-			delay(half);
-			digitalWrite(muziekpin1, LOW);
-			digitalWrite(muziekpin1, HIGH);
-			delay(achtste);
-			digitalWrite(muziekpin1, LOW);
-			delay(kwart);
-			digitalWrite(muziekpin1, HIGH);
-			delay(achtste);
-			digitalWrite(muziekpin1, LOW);
-			digitalWrite(muziekpin1, HIGH);
-			delay(heel);
-			digitalWrite(muziekpin1, LOW);
-		break;
-	}
-}
-
-/* Uit gecomment omdat ze niet werken met timer interrupts wegens vermoedelijk de tone functie
 void dobeep(int8_t beepkeuze){ // do beep WERKT NIET MET TIMER INTERRUPT ATM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	switch (beepkeuze){
 		case beeppersoon:
 	   // beep beep
-		  tone(muziekpin1, NOTE_B5, kwart);
+		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		  delay(kwart);
-		  noTone(muziekpin1);
-		  delay(kwart);
-		  tone(muziekpin1, NOTE_B5, kwart);
-		  delay(kwart);
-		  noTone(muziekpin1);
+		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		break;
 		
 		case beepvolgaan:
 			// beep beeeeeeeeeeeepppp
-		  tone(muziekpin1, NOTE_B5, kwart);
+		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		  delay(kwart);
-		  noTone(muziekpin1);
-		  delay(kwart);
-		  tone(muziekpin1, NOTE_B5, heel);
-		  delay(heel);
-		  noTone(muziekpin1);
+		  TimerFreeTone(muziekpin1, NOTE_B5, heel);
 		break;
 		
 		case beepvolguit:
 			// beeeeeeeeeeeeeeeeppp beep
-		  tone(muziekpin1, NOTE_B5, heel);
-		  delay(heel);
-		  noTone(muziekpin1);
+		  TimerFreeTone(muziekpin1, NOTE_B5, heel);
 		  delay(kwart);
-		  tone(muziekpin1, NOTE_B5, kwart);
-		  delay(kwart);
-		  noTone(muziekpin1);
+		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		break;
 		
 		case beepPersoon2:
 			// beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep
 		  for(uint8_t i=0; i< 8; i++){
-			  tone(muziekpin1, NOTE_B5, kwart);
-			  delay(kwart);
-			  noTone(muziekpin1);
+			  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 			  delay(kwart);
 			}
 		break;
 		
 		case victoryBeep:
 			// Final fantasy tune
-			tone(muziekpin1, NOTE_B5, zestiende);
+			TimerFreeTone(muziekpin1, NOTE_B5, zestiende);;
 			delay(zestiende);
-			noTone(muziekpin1);
+			TimerFreeTone(muziekpin1, NOTE_B5, zestiende);
 			delay(zestiende);
-			tone(muziekpin1, NOTE_B5, zestiende);
+			TimerFreeTone(muziekpin1, NOTE_B5, zestiende);
 			delay(zestiende);
-			noTone(muziekpin1);
-			delay(zestiende);
-			tone(muziekpin1, NOTE_B5, zestiende);
-			delay(zestiende);
-			noTone(muziekpin1);
-			delay(zestiende);
-			tone(muziekpin1, NOTE_B5, half);
-			delay(half);
-			noTone(muziekpin1);
-			tone(muziekpin1, NOTE_G5, half);
-			delay(half);
-			noTone(muziekpin1);
-			tone(muziekpin1, NOTE_A5, half);
-			delay(half);
-			noTone(muziekpin1);
-			tone(muziekpin1, NOTE_B5, achtste);
-			delay(achtste);
-			noTone(muziekpin1);
+			TimerFreeTone(muziekpin1, NOTE_B5, half);
+			TimerFreeTone(muziekpin1, NOTE_G5, half);
+			TimerFreeTone(muziekpin1, NOTE_A5, half);
+			TimerFreeTone(muziekpin1, NOTE_B5, achtste);
 			delay(kwart);
-			tone(muziekpin1, NOTE_A5, achtste);
-			delay(achtste);
-			noTone(muziekpin1);
-			tone(muziekpin1, NOTE_B5, heel);
-			delay(heel);
-			noTone(muziekpin1);
+			TimerFreeTone(muziekpin1, NOTE_A5, achtste);
+			TimerFreeTone(muziekpin1, NOTE_B5, heel);
 		break;
 	}
 }
-*/
 
 void bijsturen(uint16_t voor, uint16_t achter, uint16_t afwijking){
   //uint16_t RPMVerandering = (afwijking-maxAfwijkingZij)*snelheidAfwijkingConstante;
@@ -1065,6 +949,6 @@ bool leesKnop(uint8_t knopPin) {
   return(true);
 }
 
-ISR(TIMER0_COMPA_vect){
+ISR(TIMER2_COMPA_vect){
   timerFlag++;
 }

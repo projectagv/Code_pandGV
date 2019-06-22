@@ -2,9 +2,6 @@
 #include "VL53L0X.h"
 #include "TimerFreeTone.h"
 
-// dingen comment do stuff
-// BRAAAAAAAAAAAAAAAAAAAAAAAAAANCCCCCCCCCCCCCCCCCCCCCCCHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
-
 /* 
    De MS1 MS2 en MS3 pins zijn om hlave stappen etc in te stellen, die gebruiken we dus niet want 1 stap is goed genoeg
    Er moet een condensator van 47 microFarad tussen de Vmot(VMotor, motorvoeding), en de bijhorende GND
@@ -40,8 +37,6 @@
 #define sensor3Pin 5		// Zijkantvoor
 #define sensor4Pin 3		// Boom
 #define sensor5Pin 2		// Zijkantachter
-#define sensor6Pin 16
-#define sensor7Pin 17
 
 #define muziekpin1 0
 #define muziekpin2 1
@@ -56,8 +51,6 @@
 #define sensor3I2C 13
 #define sensor4I2C 14
 #define sensor5I2C 15
-#define sensor6I2C 16
-#define sensor7I2C 17
 
 #define kalibreren 0
 #define tellen 1
@@ -68,7 +61,7 @@
 #define stappenHeleMatY 660
 #define aantalStappenPerRotatie 200
 #define maxRPM 40
-#define standaardRPM 30
+#define standaardRPM 25
 
 #define maxAfwijkingZij 10
 #define bochtAfwijkingZij 400
@@ -129,12 +122,6 @@ VL53L0X sensorZijkantVoor;
 VL53L0X sensorBoom;
 VL53L0X sensorZijkantAchter;
 
-/*
-VL53L0X sensor6;
-VL53L0X sensor7;
-*/
-
-
 volatile float timerFlag = 0;
 float stapLTimer = 1;
 float stapRTimer = 1;
@@ -144,8 +131,6 @@ int bijstuurTimer = 1;
 
 unsigned long aantalStappenL = 0;
 unsigned long aantalStappenR = 0;
-int knopvolgen = 0;
-int knopaan = 0;
 int boomTeller = 0;
 bool boomBezig = false;
 bool openingBezig = false;
@@ -184,8 +169,8 @@ void volgenBijsturen(int,int,int);
 
 void setup() {
 
-  uint8_t sensorPinnen[] = {sensor0Pin, sensor1Pin, sensor2Pin, sensor3Pin, sensor4Pin, sensor5Pin, sensor6Pin, sensor7Pin};
-  uint8_t sensorI2C[] = {sensor0I2C, sensor1I2C, sensor2I2C, sensor3I2C, sensor4I2C, sensor5I2C, sensor6I2C, sensor7I2C};
+  uint8_t sensorPinnen[] = {sensor0Pin, sensor1Pin, sensor2Pin, sensor3Pin, sensor4Pin, sensor5Pin};
+  uint8_t sensorI2C[] = {sensor0I2C, sensor1I2C, sensor2I2C, sensor3I2C, sensor4I2C, sensor5I2C};
 
   for (uint8_t i=0; i<8; i++){
     pinMode(sensorPinnen[i], OUTPUT);
@@ -262,30 +247,6 @@ void setup() {
   delay(10);
   sensorZijkantAchter.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
   delay(10);
-
-/*
-  pinMode(sensorPinnen[6], INPUT);
-  delay(10);
-  sensor6.init(true);
-  delay(10);
-  sensor6.setTimeout(200);
-  delay(10);
-  sensor6.setAddress(sensorI2C[6]);
-  delay(10);
-  sensor6.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
-  delay(10);
-
-  pinMode(sensorPinnen[7], INPUT);
-  delay(10);
-  sensor7.init(true);
-  delay(10);
-  sensor7.setTimeout(200);
-  delay(10);
-  sensor7.setAddress(sensorI2C[7]);
-  delay(10);
-  sensor7.setMeasurementTimingBudget(40000); //(20 ms, default is 33 ms)
-  delay(10);
-*/
 
   // Instellen stappenmotorPinnen
   pinMode(stapPinL, OUTPUT);
@@ -399,7 +360,7 @@ void loop() {
     digitalWrite(richtingPinR, LOW);
     digitalWrite(stapPinR, HIGH);
     stapRTimer = 1;
-    delayMicroseconds(00);
+    delayMicroseconds(200);
     digitalWrite(stapPinR, LOW);
     aantalStappenR++;
   }
@@ -517,7 +478,7 @@ void loop() {
 				
 				
 				if ((afstandLinksVoor < medewerkerAfstand || afstandMiddenVoor < medewerkerAfstand || afstandRechtsVoor < medewerkerAfstand || stopTimer != 0) && bochtStatus == 0){  // Evil pseudocode of death, please replace
-				// Als 1 van de 3 sensoren voor een medewerker detecteerd binnen de minimale afstand OF we al aan het wachten waren (nodig voor reset)
+				// Als 1 van de 3 sensoren voor een medewerker detecteerd binnen de minimale afstand OF we al aan het wachten waren (nodig voor reset) EN we ook niet al in een bocht zijn
 					LRPM = 0;
 					RRPM = 0; // stop
 					
@@ -570,19 +531,14 @@ void loop() {
 						if (temp){ // einde bocht, reset waardes
 							bochtStatus = 0;
 							if (switchTellen == 4){ // Als het het einde van de complete ronde van de AGV is
-								//Einde ronde, doe dingen ofzo, idk
+								//Einde ronde, doe dingen ofzo, idk, moet eigenlijk nog besloten worden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 								RRPM = 0;
 								LRPM = 0;
 								
 								for (uint16_t i=0; i<boomTeller; i++){ // Aantal getelde bomen beeps
-								// Beeps moeten waarschijnlijk vervangen worden ///////////////////////////////////////////////////////////////////////////////////////////
-								//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-									digitalWrite(muziekpin1, HIGH);
-									delay(half);
-									digitalWrite(muziekpin1, LOW);
-									delay(half);
+									dobeep(beepboom);
+									delay(1000);
 								}
-								//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 								
 								delay(2000);
 								
@@ -612,10 +568,10 @@ void loop() {
 					
 					if (stopTimer == 0){ // start timer als dit de eerste keer is
 						stopTimer = 1;
-						//dobeep(beeppersoon); // Beep naar de persoon
+						dobeep(beeppersoon); // Beep naar de persoon
 					}
 					if (stopTimer > 5000){ // als we al 5 seconden wachten, beep urgenter
-						//dobeep(beepPersoon2);
+						dobeep(beepPersoon2);
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					if (stopTimer > 15000){ // Als we al 15 seconden wachten, assume bug, assume muur, werkt nu niet, en kan misschien beter iets compleet anders zijn
@@ -656,10 +612,10 @@ void loop() {
 					openingBezig = true;
 					if (openingTeller > openingen){ // Als het de bochtopening is doe bochtdingen, zelfde als boven
 						if (bochtStatus == 0){ 	// Als dit de eerste keer is, bocht gedetecteerd dus initaliseer
-						bochtStatus = 1;
-						beginBochtStappen = aantalStappenR;
-						LRPM = bochtRPM;
-						RRPM = bochtRPM;
+							bochtStatus = 1;
+							beginBochtStappen = aantalStappenR;
+							LRPM = bochtRPM;
+							RRPM = bochtRPM;
 						}
 				
 						if (bochtStatus == 1){	// Rij door tot de voorwaartse afstand overbrugt is, is stukje sensorafwijking omdat hij onder een hoek staat, en doorrijden tot midden van wielen
@@ -691,8 +647,7 @@ void loop() {
     
     case volgen:
 		if (!begonnen){ // als dit de eerste keer in de case is, initialiseer
-			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is 
-			// HIER DINGEN VERANDERD< W@AS EEN WHILE N+LOOP< NU EEN IF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6 && afstandMiddenVoor > volAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is , niet te diht bij en niet te ver
 				begonnen = true;
 				RRPM = standaardRPM;
 				LRPM = standaardRPM;
@@ -706,7 +661,7 @@ void loop() {
   }
 }
 
-void dobeep(int8_t beepkeuze){ // do beep WERKT NIET MET TIMER INTERRUPT ATM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void dobeep(int8_t beepkeuze){ // FIXED
 	switch (beepkeuze){
 		case beeppersoon:
 	   // beep beep
@@ -730,7 +685,7 @@ void dobeep(int8_t beepkeuze){ // do beep WERKT NIET MET TIMER INTERRUPT ATM!!!!
 		break;
 		
 		case beepPersoon2:
-			// beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep
+			// beep beep beep beep beep beep beep beep
 		  for(uint8_t i=0; i< 8; i++){
 			  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 			  delay(kwart);

@@ -262,11 +262,13 @@ void setup() {
   digitalWrite(enablePinR, LOW);
 
   // Instellen timerInterrupt op 1 ms
+  // Timer2 want Timer0 is nodig voor de delay functies, en Timer1 is nodig voor servo's (niet gebruikt in dit project)
   TCCR2A = 0;// set entire TCCR0A register to 0
   TCCR2B = 0;// same for TCCR0B
   TCNT2  = 0;//initialize counter value to 0
   // set compare match register for 1khz increments
-  OCR2A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms  
+  OCR2A = 49;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms, 49 voor 1/5 ms
+			//  = (16*10^6)kloktijd / ((1000)frequentie in HZ, * (64)prescaler) - 1
   // turn on CTC mode
   TCCR2A |= (1 << WGM21);
   // Set CS01 and CS00 bits for 64 prescaler
@@ -332,19 +334,19 @@ void loop() {
 	
 	if (timerFlag){ //Als er minstens 1/4 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
 		if (bijstuurTimer){
-			bijstuurTimer += timerFlag/4;
+			bijstuurTimer += timerFlag/5;
 			if (bijstuurTimer > bijstuurTimerMax){
 				bijstuurTimer = 0;
 			}
 		}
 		if (stapLTimer){
-			stapLTimer += timerFlag/4;
+			stapLTimer += timerFlag/5;
 		}
 		if (stapRTimer){
-			stapRTimer += timerFlag/4;
+			stapRTimer += timerFlag/5;
 		}
 		if (stopTimer){
-			stopTimer += timerFlag/4;
+			stopTimer += timerFlag/5;
 		}
 		timerFlag = 0;
 		// !!!!!!!!!!!!!!!!!! Double check of alle timers hier in staan, anders werken ze obviously niet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -61,10 +61,10 @@
 #define stappenHeleMatY 660
 #define aantalStappenPerRotatie 200
 #define maxRPM 40
-#define standaardRPM 25
+#define standaardRPM 15
 
-#define maxAfwijkingZij 10
-#define bochtAfwijkingZij 100
+#define maxAfwijkingZij 15
+#define bochtAfwijkingZij 110
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
 
@@ -76,8 +76,8 @@
 #define aantalRotatiesPerGrade afgelegdeHoekPerRotatie/360
 #define aantalStappenPerGrade aantalRotatiesPerGrade * aantalStappenPerRotatie
 
-#define bijstuurTimerMax 500 // de timer die overschreden moet worden om opnieuw bij te sturen
-#define snelheidAfwijkingConstante 3  // het aantal rpm verandering dat we willen
+#define bijstuurTimerMax 200 // de timer die overschreden moet worden om opnieuw bij te sturen
+#define snelheidAfwijkingConstante 1  // het aantal rpm verandering dat we willen
 #define volgAfstand 80  // de afstand tussen agv en volgpersoon
 #define boomafstand // de afstand tussen agv en boom voor tellen
 #define beepboom 1 //beep voor boom
@@ -114,7 +114,7 @@
 #define achtste			periode / 8
 #define zestiende 		periode / 16
 
-#define sensorTimeBudget 60000
+#define sensorTimeBudget 40000
 
 
 VL53L0X sensorLinksVoor;
@@ -129,7 +129,7 @@ float stapLTimer = 1;
 float stapRTimer = 1;
 float LRPM = 0;
 float RRPM = 0;
-int bijstuurTimer = 1;
+float bijstuurTimer = 1;
 
 unsigned long aantalStappenL = 0;
 unsigned long aantalStappenR = 0;
@@ -335,20 +335,21 @@ void loop() {
 	}
 	
 	if (timerFlag){ //Als er minstens 1/4 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
+    float temp = timerFlag/5;
 		if (bijstuurTimer){
-			bijstuurTimer += timerFlag/5;
+			bijstuurTimer += temp;
 			if (bijstuurTimer > bijstuurTimerMax){
 				bijstuurTimer = 0;
 			}
 		}
 		if (stapLTimer){
-			stapLTimer += timerFlag/5;
+			stapLTimer += temp;
 		}
 		if (stapRTimer){
-			stapRTimer += timerFlag/5;
+			stapRTimer += temp;
 		}
 		if (stopTimer){
-			stopTimer += timerFlag/5;
+			stopTimer += temp;
 		}
 		timerFlag = 0;
 		// !!!!!!!!!!!!!!!!!! Double check of alle timers hier in staan, anders werken ze obviously niet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -360,8 +361,8 @@ void loop() {
 	  stapRTimer = 1;
   }
 
-  if (stapRTimer > (1000/((RRPM/60)*200))){ // verkeerd om, daarom low
-    digitalWrite(richtingPinR, LOW);
+  if (stapRTimer > (1000/((RRPM/60)*200))){
+    digitalWrite(richtingPinR, HIGH);
     digitalWrite(stapPinR, HIGH);
     stapRTimer = 1;
     delayMicroseconds(200);
@@ -373,8 +374,8 @@ void loop() {
 	  stapLTimer = 1;
   }
   
-  if (stapLTimer > (1000/((LRPM/60)*200))){
-    digitalWrite(richtingPinL, HIGH);
+  if (stapLTimer > (1000/((LRPM/60)*200))){ // verkeerd om, daarom low
+    digitalWrite(richtingPinL, LOW);
     digitalWrite(stapPinL, HIGH);
     stapLTimer = 1;
     delayMicroseconds(200);
@@ -819,22 +820,22 @@ bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
   }
   
   if (hoek < 100 && hoek > 0){
-    digitalWrite(richtingPinL, HIGH);
+    digitalWrite(richtingPinL, LOW); // verkeerd om, daarom low
     digitalWrite(stapPinL, HIGH);
     delayMicroseconds(500);
     digitalWrite(stapPinL, LOW);
     delayMicroseconds(4500);
   }
   else if (hoek > -100 && hoek < 0){
-    digitalWrite(richtingPinR, LOW); // verkeerd om, daarom low
+    digitalWrite(richtingPinR, HIGH);
     digitalWrite(stapPinR, HIGH);
     delayMicroseconds(500);
     digitalWrite(stapPinR, LOW);
     delayMicroseconds(4500);
   }
   else if (hoek == 180){
-    digitalWrite(richtingPinR, LOW); // verkeerd om, daarom low
-    digitalWrite(richtingPinL, LOW);
+    digitalWrite(richtingPinR, HIGH);
+    digitalWrite(richtingPinL, HIGH); // verkeerd om, daarom high
     digitalWrite(stapPinR, HIGH);
     digitalWrite(stapPinL, HIGH);
     delayMicroseconds(500);

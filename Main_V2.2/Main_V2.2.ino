@@ -5,7 +5,7 @@
 // dingen comment do stuff
 // BRAAAAAAAAAAAAAAAAAAAAAAAAAANCCCCCCCCCCCCCCCCCCCCCCCHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
 
-/* 
+/*
    De MS1 MS2 en MS3 pins zijn om hlave stappen etc in te stellen, die gebruiken we dus niet want 1 stap is goed genoeg
    Er moet een condensator van 47 microFarad tussen de Vmot(VMotor, motorvoeding), en de bijhorende GND
    De 1A en 1B moeten op dezelfde coil zitten
@@ -27,7 +27,7 @@
 // rechtsvoor = rechtsvoor arduino
 
 #define stapPinL 11			// Linker wiel
-#define richtingPinL 12 
+#define richtifngPinL 12 
 #define enablePinL 13
 
 #define stapPinR 8          // verkeerd om Rechter wiel
@@ -113,7 +113,7 @@
 // volgAan = A0
 // noodstop = A1
 
-// Muziek defines, periode is de periode van een 4maat in ms, 
+// Muziek defines, periode is de periode van een 4maat in ms,
 #define periode 		857
 #define heel			periode
 #define half			periode / 2
@@ -191,7 +191,7 @@ void setup() {
     pinMode(sensorPinnen[i], OUTPUT);
     digitalWrite(sensorPinnen[i], LOW);
   }
-  
+
   Wire.begin();
 
   dobeep(beeppersoon);
@@ -289,7 +289,7 @@ void setup() {
 
   // Instellen stappenmotorPinnen
   pinMode(stapPinL, OUTPUT);
-  pinMode(stapPinR, OUTPUT); 
+  pinMode(stapPinR, OUTPUT);
   pinMode(richtingPinL, OUTPUT);
   pinMode(richtingPinR, OUTPUT);
   pinMode(enablePinL, OUTPUT);
@@ -305,16 +305,16 @@ void setup() {
   TCCR2B = 0;// same for TCCR0B
   TCNT2  = 0;//initialize counter value to 0
   // set compare match register for 1khz increments
-  OCR2A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms  
+  OCR2A = 62;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms
   // turn on CTC mode
   TCCR2A |= (1 << WGM21);
   // Set CS01 and CS00 bits for 64 prescaler
-  TCCR2B |= (1 << CS21) | (1 << CS20);   
+  TCCR2B |= (1 << CS21) | (1 << CS20);
   // enable timer compare interrupt
   TIMSK2 |= (1 << OCIE2A);
 
   sei();
-  
+
   sensorLinksVoor.startSensor();
   sensorZijkantVoor.startSensor();
 
@@ -335,14 +335,14 @@ void loop() {
 			}
 		}
 	}
- 
+
 	if (!leesKnop(volgKnop)){ // Volgknop ingedrukt
 		delay(20);
 		if(!leesKnop(volgKnop)){ // Double check
-		
+
 			while(!leesKnop(volgKnop)){	// Zolang de knop ingedrukt is
 			}
-			
+
 			volgModus = !volgModus;		// toggle de waarde van volgModus
 			if (volgModus){
 				dobeep(beepvolgaan);	// doe de dingen voor de bijhorende nieuwe waarde van volgmodus
@@ -355,7 +355,7 @@ void loop() {
 			begonnen = false;
 		}
 	}
-	
+
 	if (RRPM > maxRPM){ // als de max is overschreden, zet terug naar max
 		RRPM = maxRPM;
 	}
@@ -368,7 +368,7 @@ void loop() {
 	if (LRPM < 0){
 		LRPM = 0;
 	}
-	
+
 	if (timerFlag){ //Als er minstens 1/4 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
 		if (bijstuurTimer){
 			bijstuurTimer += timerFlag/4;
@@ -388,8 +388,8 @@ void loop() {
 		timerFlag = 0;
 		// !!!!!!!!!!!!!!!!!! Double check of alle timers hier in staan, anders werken ze obviously niet !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}
-	
-	
+
+
   // motoren aansturen
   if (RRPM == 0){	// Reset timer bij 0 rpm
 	  stapRTimer = 1;
@@ -403,11 +403,11 @@ void loop() {
     digitalWrite(stapPinR, LOW);
     aantalStappenR++;
   }
-  
+
   if (LRPM == 0){	// zelfde
 	  stapLTimer = 1;
   }
-  
+
   if (stapLTimer > (1000/((LRPM/60)*200))){
     digitalWrite(richtingPinL, HIGH);
     digitalWrite(stapPinL, HIGH);
@@ -419,16 +419,16 @@ void loop() {
   // motoren aansturen
 
   updateSensoren(); // Functie die de samenwerking van sensoren verzorgt en data refreshed waar mogelijk
-  
-  
+
+
   switch (switchVar){ // Switch case tussen kalibreren, tellen en volgen
     /*
     case kalibreren:
       uint16_t afwijking = (sqrt(pow(afstandZijkantVoor - afstandZijkantAchter, 2)));
-      if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0){ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms (is dit wel nodig???) 
+      if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0){ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms (is dit wel nodig???)
         bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking);
       }
-      
+
       if (medewerker){  // Evil pseudocode of death, please replace
          LRPM = 0;
          RRPM = 0; // stop
@@ -439,15 +439,15 @@ void loop() {
                 // als timer > x, doe andere dingen die we nog niet gedefinieerd hebben, uit gecomment want compiler
           }
         }
-       
-    
+
+
       }
       if (bocht || bochtStatus != 0){ // Als bocht of bocht al begonnen is bochtlogica herkennning moet nog
         if (bochtStatus == 0){
           bochtStatus = 1;
           beginBochtStappen = aantalStappenR;
         }
-        
+
         if (bochtStatus == 1){
           LRPM = bochtRPM;
           RRPM = bochtRPM;
@@ -455,12 +455,12 @@ void loop() {
             bochtStatus = 2;
           }
         }
-        
+
         if (bochtStatus == 2){
           beginBochtStappen = aantalStappenR;
           bochtStatus = 3;
         }
-        
+
         if (bochtStatus == 3){
           bool temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
           if (temp){
@@ -468,7 +468,7 @@ void loop() {
           }
         }
       }
-      
+
     break;
     */
 
@@ -478,49 +478,49 @@ void loop() {
 		  RRPM = standaardRPM;
 		  LRPM = standaardRPM;
 		}
-    
-		switch(switchTellen){ // switch case tussen delen van de route, 
+
+		switch(switchTellen){ // switch case tussen delen van de route,
 			case 0: // stuk naar rechts + bocht
 			case 2:	// stuk naar links + bocht
 			case 4:	// stuk naar rechts + bocht, einde rondje
-		  
+
 				if (afstandBoom < 200 && boomBezig == false){ // Als je een boom ziet die nog niet gezien is
 					boomTeller++;
 					dobeep(beepboom);
 				}
-				
+
 				if (afstandBoom > 200){	// Detecteer einde van een boom
 					boomBezig == false;
 				}
-	   
+
 				if (afstandZijkantAchter < 250){ // bij het zien van de omkeping achter
 					begonnen = true;
 				}
-			
+
 				uint16_t afwijking = (sqrt(pow(afstandZijkantVoor - afstandZijkantAchter, 2))); // verschil tussen voor en achter absoluut
-				
+
 				if (afwijking > maxAfwijkingZij && afwijking < bochtAfwijkingZij && bijstuurTimer == 0 && bochtStatus == 0);{ // Bijsturen als de sensorwaardes niet binnen de mogelijke afwijking zijn, maar het geen bocht is EN er niet bijgestuurd is in de laatste x ms
 					bijsturen(afstandZijkantVoor, afstandZijkantAchter, afwijking); // Bijstuurfunctie, gebruikt afstanden en verschil, past de snelheden aan
 				}
-				
+
 				/*
 				if (afstandZijkantVoor * afstandsFactorZijkant > zijkantAfstandOptimum + maxAfwijkingZij && bijstuurTimer == 0){ // Stuur bovendien 4 RPM bij afhankelijk van hoeveer de voorste sensor van de omkeping
 					RRPM += 4;
 					LRPM -= 4;
 				}
-				
+
 				else if (afstandZijkantVoor * afstandsFactorZijkant < zijkantAfstandOptimum - maxAfwijkingZij && bijstuurTimer == 0){
 					RRPM -= 4;
 					LRPM += 4;
 				}
 				*/
-				
-				
+
+
 				if ((afstandLinksVoor < medewerkerAfstand || afstandMiddenVoor < medewerkerAfstand || afstandRechtsVoor < medewerkerAfstand || stopTimer != 0) && bochtStatus == 0){  // Evil pseudocode of death, please replace
 				// Als 1 van de 3 sensoren voor een medewerker detecteerd binnen de minimale afstand OF we al aan het wachten waren (nodig voor reset)
 					LRPM = 0;
 					RRPM = 0; // stop
-					
+
 					if (stopTimer == 0){ // start timer als dit de eerste keer is
 						stopTimer = 1;
 						dobeep(beeppersoon); // Beep naar de persoon
@@ -537,14 +537,14 @@ void loop() {
 						// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					
+
 					if (afstandLinksVoor > medewerkerAfstand && afstandMiddenVoor > medewerkerAfstand && afstandRechtsVoor > medewerkerAfstand){ // Als de mederwerken niet meer gedetecteerd wordt, reset waardes
 						stopTimer = 0;
 						LRPM = standaardRPM;
 						RRPM = standaardRPM;
 					}
 				}
-			
+
 				if ((afstandZijkantVoor > afstandZijkantAchter && afwijking > bochtAfwijkingZij) || bochtStatus != 0){ // Als bocht of bocht al begonnen is
 					if (bochtStatus == 0){ 	// Als dit de eerste keer is, bocht gedetecteerd dus initaliseer
 						bochtStatus = 1;
@@ -552,18 +552,18 @@ void loop() {
 						LRPM = bochtRPM;
 						RRPM = bochtRPM;
 					}
-				
+
 					if (bochtStatus == 1){	// Rij door tot de voorwaartse afstand overbrugt is, is stukje sensorafwijking omdat hij onder een hoek staat, en doorrijden tot midden van wielen
 						if (aantalStappenR > (beginBochtStappen + (voorTotMidden + lengteAfwijkingSensor)*afstandPerStap)){
 							bochtStatus = 2; //  volgende stap als de afstand overbrugt is
 						}
 					}
-				
+
 					if (bochtStatus == 2){ // Sla het huidige aantal stappen genomen door de rechter stappenmotor
 						beginBochtStappen = aantalStappenR;
 						bochtStatus = 3;
 					}
-				
+
 					if (bochtStatus == 3){ // Zet bochtstappen tot aan de hoekverdraaiing, dat is einde van deze case
 						bool temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
 						aantalStappenR++;
@@ -573,7 +573,7 @@ void loop() {
 								//Einde ronde, doe dingen ofzo, idk
 								RRPM = 0;
 								LRPM = 0;
-								
+
 								for (uint16_t i=0; i<boomTeller; i++){ // Aantal getelde bomen beeps
 								// Beeps moeten waarschijnlijk vervangen worden ///////////////////////////////////////////////////////////////////////////////////////////
 								//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -583,11 +583,11 @@ void loop() {
 									delay(half);
 								}
 								//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-								
+
 								delay(2000);
-								
+
 								dobeep(victoryBeep);
-								
+
 								while(true){
 								} // Infinite loop voor einde
 							}
@@ -599,17 +599,17 @@ void loop() {
 					}
 				}
 			break;
-	  
+
 
 			case 1: // Stuk omhoog, 2 openingen, dan bocht
 			case 3: // stuk naar beneden, 1 opening, dan bocht
-			
+
 				// ALS MEDEWERKER -- fixed
 				if ((afstandMiddenVoor < medewerkerAfstand || stopTimer != 0) && bochtStatus == 0){  // Evil pseudocode of death, please replace
 				// Als 1 van de 3 sensoren voor een medewerker detecteerd binnen de minimale afstand OF we al aan het wachten waren (nodig voor reset)
 					LRPM = 0;
 					RRPM = 0; // stop
-					
+
 					if (stopTimer == 0){ // start timer als dit de eerste keer is
 						stopTimer = 1;
 						//dobeep(beeppersoon); // Beep naar de persoon
@@ -626,15 +626,15 @@ void loop() {
 						// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					}
 					// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-					
+
 					if (afstandLinksVoor > medewerkerAfstand && afstandMiddenVoor > medewerkerAfstand && afstandRechtsVoor > medewerkerAfstand){ // Als de mederwerken niet meer gedetecteerd wordt, reset waardes
 						stopTimer = 0;
 						LRPM = standaardRPM;
 						RRPM = standaardRPM;
 					}
 				}
-		
-		
+
+
 				int8_t openingen;
 				if (switchTellen == 1){ // Detectie of het case 1 of 3 is, want ze hebben een andere hoeveelheid lege stukken die ze moeten overbruggen
 					openingen = 2;
@@ -644,13 +644,13 @@ void loop() {
 				}
 				LRPM = bochtRPM;
 				RRPM = bochtRPM;
-				
+
 				uint16_t tempAfwijking = (sqrt(pow(afstandZijkantVoor - afstandZijkantAchter, 2)));
-				
+
 				if (tempAfwijking < bochtAfwijkingZij){ // Als we niet langs een opening aan het rijden zijn
 					openingBezig = false;
 				}
-		
+
 				if ((afstandZijkantVoor > afstandZijkantAchter && tempAfwijking > bochtAfwijkingZij && openingBezig == false) || bochtStatus != 0){ // De eerste keer afstand voor groter is dan achter, en het een bochtafstand is OF we al in een bocht zijn
 					openingTeller++;
 					openingBezig = true;
@@ -661,18 +661,18 @@ void loop() {
 						LRPM = bochtRPM;
 						RRPM = bochtRPM;
 						}
-				
+
 						if (bochtStatus == 1){	// Rij door tot de voorwaartse afstand overbrugt is, is stukje sensorafwijking omdat hij onder een hoek staat, en doorrijden tot midden van wielen
 							if (aantalStappenR > (beginBochtStappen + (voorTotMidden + lengteAfwijkingSensor)*afstandPerStap)){
 								bochtStatus = 2; //  volgende stap als de afstand overbrugt is
 							}
 						}
-					
+
 						if (bochtStatus == 2){ // Sla het huidige aantal stappen genomen door de rechter stappenmotor
 							beginBochtStappen = aantalStappenR;
 							bochtStatus = 3;
 						}
-					
+
 						if (bochtStatus == 3){ // Zet bochtstappen tot aan de hoekverdraaiing, dat is einde van deze case
 							bool temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
 							aantalStappenR++;
@@ -688,10 +688,10 @@ void loop() {
 			break;
 		}
     break; // Einde case tellen
-    
+
     case volgen:
 		if (!begonnen){ // als dit de eerste keer in de case is, initialiseer
-			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is 
+			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is
 			// HIER DINGEN VERANDERD< W@AS EEN WHILE N+LOOP< NU EEN IF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				begonnen = true;
 				RRPM = standaardRPM;
@@ -714,21 +714,21 @@ void dobeep(int8_t beepkeuze){ // do beep WERKT NIET MET TIMER INTERRUPT ATM!!!!
 		  delay(kwart);
 		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		break;
-		
+
 		case beepvolgaan:
 			// beep beeeeeeeeeeeepppp
 		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		  delay(kwart);
 		  TimerFreeTone(muziekpin1, NOTE_B5, heel);
 		break;
-		
+
 		case beepvolguit:
 			// beeeeeeeeeeeeeeeeppp beep
 		  TimerFreeTone(muziekpin1, NOTE_B5, heel);
 		  delay(kwart);
 		  TimerFreeTone(muziekpin1, NOTE_B5, kwart);
 		break;
-		
+
 		case beepPersoon2:
 			// beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep beep
 		  for(uint8_t i=0; i< 8; i++){
@@ -736,7 +736,7 @@ void dobeep(int8_t beepkeuze){ // do beep WERKT NIET MET TIMER INTERRUPT ATM!!!!
 			  delay(kwart);
 			}
 		break;
-		
+
 		case victoryBeep:
 			// Final fantasy tune
 			TimerFreeTone(muziekpin1, NOTE_B5, zestiende);;
@@ -775,7 +775,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 	uint16_t LM = sqrt(pow(links-midden, 2));		// Verschil Links en Midden
 	uint16_t MR = sqrt(pow(midden-rechts, 2));	// Verschil Midden en Rechts
 	uint16_t LR = sqrt(pow(links-rechts, 2));		// Verschil Links en Rechts
-  
+
 	if(MR + volgAfwijking < LM && MR + volgAfwijking < LR && links < rechts){
 		LRPM -= 2*snelheidAfwijkingConstante;
 		RRPM += 2*snelheidAfwijkingConstante;
@@ -788,7 +788,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	else if(LM + volgAfwijking < LR && LM + volgAfwijking < MR && links < rechts){
 		LRPM -= snelheidAfwijkingConstante;
 		RRPM += snelheidAfwijkingConstante;
@@ -801,7 +801,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	else if(MR + volgAfwijking < LM && MR + volgAfwijking < LR && rechts < links){
 		LRPM += snelheidAfwijkingConstante;
 		RRPM -= snelheidAfwijkingConstante;
@@ -814,7 +814,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	else if(LM + volgAfwijking < LR && LM + volgAfwijking < MR && rechts < links){
 		LRPM += 2*snelheidAfwijkingConstante;
 		RRPM -= 2*snelheidAfwijkingConstante;
@@ -827,7 +827,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	else if(LR + volgAfwijking < LM && LR + volgAfwijking < MR){
 		if (midden + maxAfwijkingZij < volgAfstand){
 			LRPM -= snelheidAfwijkingConstante;
@@ -838,7 +838,7 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	else{
 		if (midden + maxAfwijkingZij < volgAfstand){
 			LRPM -= snelheidAfwijkingConstante;
@@ -849,16 +849,16 @@ void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer ch
 			RRPM += snelheidAfwijkingConstante;
 		}
 	}
-	
+
 	bijstuurTimer = 1;
 }
 
 bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
-  
+
   if (aantalStappenGedaan >= sqrt(pow(hoek*aantalStappenPerGrade, 2))){
     return true;
   }
-  
+
   if (hoek < 100 && hoek > 0){
     digitalWrite(richtingPinL, HIGH);
     digitalWrite(stapPinL, HIGH);
@@ -883,7 +883,7 @@ bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
     digitalWrite(stapPinL, LOW);
     delayMicroseconds(4500);
   }
-  
+
   return false;
 }
 
@@ -896,7 +896,7 @@ void updateSensoren(){
         sensorVoorTemp = sensorMiddenVoor.startSensor();
       }
     break;
-    
+
     case 1:
       if(sensorMiddenVoor.checkSensorData(sensorVoorTemp) == 0){
         afstandMiddenVoor = sensorMiddenVoor.leesSensor();
@@ -922,7 +922,7 @@ void updateSensoren(){
         sensorZijTemp = sensorBoom.startSensor();
       }
     break;
-    
+
     case 1:
       if(sensorBoom.checkSensorData(sensorZijTemp) == 0){
         afstandBoom = sensorBoom.leesSensor();

@@ -114,6 +114,8 @@
 #define achtste			periode / 8
 #define zestiende 		periode / 16
 
+#define sensorTimeBudget 60000
+
 
 VL53L0X sensorLinksVoor;
 VL53L0X sensorMiddenVoor;
@@ -190,7 +192,7 @@ void setup() {
   delay(10);
   sensorLinksVoor.setAddress(sensorI2C[0]);
   delay(10);
-  sensorLinksVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorLinksVoor.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[1], INPUT);
@@ -201,7 +203,7 @@ void setup() {
   delay(10);
   sensorMiddenVoor.setAddress(sensorI2C[1]);
   delay(10);
-  sensorMiddenVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorMiddenVoor.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[2], INPUT);
@@ -212,7 +214,7 @@ void setup() {
   delay(10);
   sensorRechtsVoor.setAddress(sensorI2C[2]);
   delay(10);
-  sensorRechtsVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorRechtsVoor.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[3], INPUT);
@@ -223,7 +225,7 @@ void setup() {
   delay(10);
   sensorZijkantVoor.setAddress(sensorI2C[3]);
   delay(10);
-  sensorZijkantVoor.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorZijkantVoor.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[4], INPUT);
@@ -234,7 +236,7 @@ void setup() {
   delay(10);
   sensorBoom.setAddress(sensorI2C[4]);
   delay(10);
-  sensorBoom.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorBoom.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   pinMode(sensorPinnen[5], INPUT);
@@ -245,7 +247,7 @@ void setup() {
   delay(10);
   sensorZijkantAchter.setAddress(sensorI2C[5]);
   delay(10);
-  sensorZijkantAchter.setMeasurementTimingBudget(35000); //(20 ms, default is 33 ms)
+  sensorZijkantAchter.setMeasurementTimingBudget(sensorTimeBudget); //(20 ms, default is 33 ms)
   delay(10);
 
   // Instellen stappenmotorPinnen

@@ -63,7 +63,7 @@
 #define maxRPM 40
 #define standaardRPM 25
 
-#define maxAfwijkingZij 8
+#define maxAfwijkingZij 10
 #define bochtAfwijkingZij 100
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
@@ -76,8 +76,8 @@
 #define aantalRotatiesPerGrade afgelegdeHoekPerRotatie/360
 #define aantalStappenPerGrade aantalRotatiesPerGrade * aantalStappenPerRotatie
 
-#define bijstuurTimerMax 400 // de timer die overschreden moet worden om opnieuw bij te sturen
-#define snelheidAfwijkingConstante 2  // het aantal rpm verandering dat we willen per afwijking in mm aan de zijkant
+#define bijstuurTimerMax 500 // de timer die overschreden moet worden om opnieuw bij te sturen
+#define snelheidAfwijkingConstante 3  // het aantal rpm verandering dat we willen
 #define volgAfstand 80  // de afstand tussen agv en volgpersoon
 #define boomafstand // de afstand tussen agv en boom voor tellen
 #define beepboom 1 //beep voor boom

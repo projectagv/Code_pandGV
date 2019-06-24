@@ -649,7 +649,7 @@ void loop() {
     
     case volgen:
 		if (!begonnen){ // als dit de eerste keer in de case is, initialiseer
-			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6 && afstandMiddenVoor > volAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is , niet te diht bij en niet te ver
+			if(afstandMiddenVoor < volgAfstand + maxAfwijkingZij*6 && afstandMiddenVoor > volgAfstand + maxAfwijkingZij*6){ // wacht tot medewerken op afstand is , niet te diht bij en niet te ver
 				begonnen = true;
 				RRPM = standaardRPM;
 				LRPM = standaardRPM;

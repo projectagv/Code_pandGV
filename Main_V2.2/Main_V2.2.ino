@@ -63,8 +63,8 @@
 #define maxRPM 40
 #define standaardRPM 25
 
-#define maxAfwijkingZij 10
-#define bochtAfwijkingZij 400
+#define maxAfwijkingZij 8
+#define bochtAfwijkingZij 100
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
 
@@ -456,7 +456,7 @@ void loop() {
 					boomBezig == false;
 				}
 	   
-				if (afstandZijkantAchter < 250){ // bij het zien van de omkeping achter
+				if (afstandZijkantAchter < 200){ // bij het zien van de omkeping achter
 					begonnen = true;
 				}
 			

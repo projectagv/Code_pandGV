@@ -63,8 +63,8 @@
 #define maxRPM 30
 #define standaardRPM 5
 
-#define maxAfwijkingZij 15
-#define bochtAfwijkingZij 110
+#define maxAfwijkingZij 10
+#define bochtAfwijkingZij 65
 #define middenTotMiddenWielen 157
 #define voorTotMidden 120
 
@@ -76,10 +76,10 @@
 #define aantalRotatiesPerGrade afgelegdeHoekPerRotatie/360
 #define aantalStappenPerGrade aantalRotatiesPerGrade * aantalStappenPerRotatie
 
-#define bijstuurTimerMax 200 // de timer die overschreden moet worden om opnieuw bij te sturen
+#define bijstuurTimerMax 1000 // de timer die overschreden moet worden om opnieuw bij te sturen
 #define snelheidAfwijkingConstante 1  // het aantal rpm verandering dat we willen
 #define volgAfstand 80  // de afstand tussen agv en volgpersoon
-#define boomafstand // de afstand tussen agv en boom voor tellen
+#define boomafstand 150// de afstand tussen agv en boom voor tellen
 #define beepboom 1 //beep voor boom
 #define beeppersoon 2 //beep voor persoon
 #define beepvolgaan 3 //beep voor volgmodus aan
@@ -87,7 +87,7 @@
 #define beepPersoon2 5
 #define victoryBeep 6
 
-#define bochtRPM 20
+#define bochtRPM 7
 #define afstandsFactorZijkant 0.97357
 #define zijkantAfstandOptimum 60
 #define medewerkerAfstand 150
@@ -115,6 +115,7 @@
 #define zestiende     periode / 16
 
 #define sensorTimeBudget 40000
+#define sensorTimeout 200
 
 
 VL53L0X sensorLinksVoor;
@@ -180,7 +181,7 @@ void setup() {
   }
   
   Wire.begin();
-  Serial.begin(9600);
+  //Serial.begin(9600);
 
   dobeep(beeppersoon);
 
@@ -270,7 +271,7 @@ void setup() {
   TCCR2B = 0;// same for TCCR0B
   TCNT2  = 0;//initialize counter value to 0
   // set compare match register for 1khz increments
-  OCR2A = 49;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms, 49 voor 1/5 ms
+  OCR2A = 24;// = (16*10^6) / (1000*64) - 1 (must be <256) 249 voor 1 ms, 49 voor 1/5 ms
       //  = (16*10^6)kloktijd / ((1000)frequentie in HZ, * (64)prescaler) - 1
   // turn on CTC mode
   TCCR2A |= (1 << WGM21);
@@ -286,11 +287,13 @@ void setup() {
 
   while(leesKnop(startKnop)){
     updateSensoren();
+    /*
     Serial.println(afstandLinksVoor);
     Serial.println(afstandMiddenVoor);
     Serial.println(afstandRechtsVoor);
     Serial.println(afstandZijkantVoor);
     Serial.println(afstandZijkantAchter);
+    */
   }
 }
 
@@ -341,7 +344,7 @@ void loop() {
   }
   
   if (timerFlag){ //Als er minstens 1/4 ms voorbij is gegaan, update alle timers, en zet de variabele terug naar 0
-    float temp = timerFlag/5;
+    float temp = timerFlag/10;
     if (bijstuurTimer){
       bijstuurTimer += temp;
       if (bijstuurTimer > bijstuurTimerMax){
@@ -541,6 +544,8 @@ void loop() {
             bool temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
             aantalStappenR++;
             if (temp){ // einde bocht, reset waardes
+              dobeep(victoryBeep);
+              delay(1000);
               bochtStatus = 0;
               if (switchTellen == 4){ // Als het het einde van de complete ronde van de AGV is
                 //Einde ronde, doe dingen ofzo, idk, moet eigenlijk nog besloten worden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -724,19 +729,19 @@ void dobeep(int8_t beepkeuze){ // FIXED
 }
 
 void bijsturen(uint16_t voor, uint16_t achter, uint16_t afwijking){
-  /*
+  
   //uint16_t RPMVerandering = (afwijking-maxAfwijkingZij)*snelheidAfwijkingConstante;
   uint16_t RPMVerandering = snelheidAfwijkingConstante;
   if (voor > achter){
-    RRPM += RPMVerandering;
-    LRPM -= RPMVerandering;
+    RRPM = standaardRPM + RPMVerandering;
+    LRPM = standaardRPM - RPMVerandering;
   }
   else{
-    RRPM -= RPMVerandering;
-    LRPM += RPMVerandering;
+    RRPM = standaardRPM - RPMVerandering;
+    LRPM = standaardRPM + RPMVerandering;
   }
   bijstuurTimer = 1;
-  */
+  
 }
 
 void volgenBijsturen(float links, float rechts, float midden){ //Nog een keer checken, volgsyntax herschreven aan de hand van de 6 vershillende mogelijkheden
@@ -829,18 +834,20 @@ bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
   }
   
   if (hoek < 100 && hoek > 0){
+    digitalWrite(stapPinR, LOW);
     digitalWrite(richtingPinL, LOW); // verkeerd om, daarom low
     digitalWrite(stapPinL, HIGH);
     delayMicroseconds(500);
     digitalWrite(stapPinL, LOW);
-    delayMicroseconds(4500);
+    delayMicroseconds(9500);
   }
   else if (hoek > -100 && hoek < 0){
+    digitalWrite(stapPinL, LOW);
     digitalWrite(richtingPinR, HIGH);
     digitalWrite(stapPinR, HIGH);
     delayMicroseconds(500);
     digitalWrite(stapPinR, LOW);
-    delayMicroseconds(4500);
+    delayMicroseconds(9500);
   }
   else if (hoek == 180){
     digitalWrite(richtingPinR, HIGH);
@@ -850,7 +857,7 @@ bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
     delayMicroseconds(500);
     digitalWrite(stapPinR, LOW);
     digitalWrite(stapPinL, LOW);
-    delayMicroseconds(4500);
+    delayMicroseconds(9500);
   }
   
   return false;
@@ -864,6 +871,11 @@ void updateSensoren(){
         sensorTellerVoor = 1;
         sensorVoorTemp = sensorMiddenVoor.startSensor();
       }
+      else if (sensorVoorTemp > sensorTimeout){
+        sensorLinksVoor.leesSensor();
+        sensorTellerVoor = 1;
+        sensorVoorTemp = sensorMiddenVoor.startSensor();
+      }
     break;
     
     case 1:
@@ -872,11 +884,21 @@ void updateSensoren(){
         sensorTellerVoor = 2;
         sensorVoorTemp = sensorRechtsVoor.startSensor();
       }
+      else if (sensorVoorTemp > sensorTimeout){
+        sensorMiddenVoor.leesSensor();
+        sensorTellerVoor = 2;
+        sensorVoorTemp = sensorRechtsVoor.startSensor();
+      }
     break;
 
     case 2:
       if(sensorRechtsVoor.checkSensorData(sensorVoorTemp) == 0){
         afstandRechtsVoor = sensorRechtsVoor.leesSensor();
+        sensorTellerVoor = 0;
+        sensorVoorTemp = sensorLinksVoor.startSensor();
+      }
+      else if (sensorVoorTemp > sensorTimeout){
+        sensorRechtsVoor.leesSensor();
         sensorTellerVoor = 0;
         sensorVoorTemp = sensorLinksVoor.startSensor();
       }
@@ -890,6 +912,11 @@ void updateSensoren(){
         sensorTellerZij = 1;
         sensorZijTemp = sensorBoom.startSensor();
       }
+      else if (sensorZijTemp > sensorTimeout){
+        sensorZijkantVoor.leesSensor();
+        sensorTellerZij = 1;
+        sensorZijTemp = sensorBoom.startSensor();
+      }
     break;
     
     case 1:
@@ -898,11 +925,21 @@ void updateSensoren(){
         sensorTellerZij = 2;
         sensorZijTemp = sensorZijkantAchter.startSensor();
       }
+      else if (sensorZijTemp > sensorTimeout){
+        sensorBoom.leesSensor();
+        sensorTellerZij = 2;
+        sensorZijTemp = sensorZijkantAchter.startSensor();
+      }
     break;
 
     case 2:
       if(sensorZijkantAchter.checkSensorData(sensorZijTemp) == 0){
         afstandZijkantAchter = sensorZijkantAchter.leesSensor();
+        sensorTellerZij = 0;
+        sensorZijTemp = sensorZijkantVoor.startSensor();
+      }
+      else if (sensorZijTemp > sensorTimeout){
+        sensorZijkantAchter.leesSensor();
         sensorTellerZij = 0;
         sensorZijTemp = sensorZijkantVoor.startSensor();
       }

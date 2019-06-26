@@ -163,6 +163,7 @@ uint32_t stopTimer = 0;
 volatile bool begonnen = false;
 bool volgModus = false;
 bool kalibrerenKlaar = true;
+bool richting = false;
 
 bool bochtDingen(uint16_t, int16_t);
 void bijsturen(uint16_t, uint16_t, uint16_t);
@@ -284,15 +285,11 @@ void setup() {
 
 	while(1){
 		if(leesKnop(startKnop)){
-			switchVar = ;
+			switchVar = 0;
 			break;
 		}
 		if(leesKnop(volgKnop)){
-			switchVar = ;
-			break;
-		}
-		if(leesKnop(noodstopKnop)){
-			switchVar = ;
+			switchVar = 1;
 			break;
 		}
 		updateSensoren();
@@ -301,14 +298,14 @@ void setup() {
 	digitalWrite(enablePinL, LOW);
 	digitalWrite(enablePinR, LOW);
 	
-	while(!leesKnop(startKnop) || !leesKnop(volgKnop) || !leesKnop(noodstopKnop)){
+	while(!leesKnop(startKnop) || !leesKnop(volgKnop)){
 		updateSensoren();
 	}
 }
 
 void loop() {
 	switch(switchVar){
-		case 0:
+		case 0: //  Rijden, bomen tellen, stoppen voor medewerker, nog een keer indrukken om rijrichting om te draaien, kan niet stoppen voor medewerker bij het achteruit rijden
 			// motoren aansturen
 			if (RRPM == 0){ // Reset timer bij 0 rpm
 				stapRTimer = 1;
@@ -355,7 +352,7 @@ void loop() {
 				}
 			}
 			
-			if(leesKnop(volgKnop){
+			if(leesKnop(volgKnop)){
 				switchVar = 1;
 				while(leesKnop(volgKnop)){
 					updateSensoren();
@@ -424,7 +421,7 @@ void loop() {
 			}
 		break;
 		
-		case 1:
+		case 1: //  
 		
 			// knoppen checken
 			if(leesKnop(startKnop)){
@@ -434,15 +431,14 @@ void loop() {
 				}
 			}
 			
-			if(leesKnop(volgKnop){
+			if(leesKnop(volgKnop)){
 				switchVar = 1;
 				while(leesKnop(volgKnop)){
 					updateSensoren();
 				}
 				
 				for(byte i=0; i<90; i++){ // draai 90 graden elke keer dat knop is ingedrukt
-					temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
-					aantalStappenR++;
+					bochtDingen(aantalStappenR - beginBochtStappen, 90);
 				}
 			}
 			
@@ -521,7 +517,7 @@ void dobeep(int8_t beepkeuze){ // FIXED
   }
 }
 
-oid updateSensoren(){
+void updateSensoren(){
   switch(sensorTellerVoor){
     case 0:
       if(sensorLinksVoor.checkSensorData(sensorVoorTemp) == 0){
@@ -603,6 +599,40 @@ oid updateSensoren(){
       }
     break;
   }
+}
+
+bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
+  
+  if (aantalStappenGedaan >= sqrt(pow(hoek*aantalStappenPerGrade, 2))){
+    return true;
+  }
+  
+  if (hoek > -100 && hoek > 0){
+    digitalWrite(richtingPinL, LOW); // verkeerd om, daarom low
+    digitalWrite(stapPinL, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(stapPinL, LOW);
+    delayMicroseconds(9500);
+  }
+  else if (hoek < 100 && hoek < 0){
+    digitalWrite(richtingPinR, HIGH);
+    digitalWrite(stapPinR, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(stapPinR, LOW);
+    delayMicroseconds(9500);
+  }
+  else if (hoek == 180){
+    digitalWrite(richtingPinR, HIGH);
+    digitalWrite(richtingPinL, HIGH); // verkeerd om, daarom high
+    digitalWrite(stapPinR, HIGH);
+    digitalWrite(stapPinL, HIGH);
+    delayMicroseconds(500);
+    digitalWrite(stapPinR, LOW);
+    digitalWrite(stapPinL, LOW);
+    delayMicroseconds(9500);
+  }
+  
+  return false;
 }
 
 bool leesKnop(uint8_t knopPin) {

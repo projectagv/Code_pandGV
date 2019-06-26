@@ -6,7 +6,8 @@
    De MS1 MS2 en MS3 pins zijn om hlave stappen etc in te stellen, die gebruiken we dus niet want 1 stap is goed genoeg
    Er moet een condensator van 47 microFarad tussen de Vmot(VMotor, motorvoeding), en de bijhorende GND
    De 1A en 1B moeten op dezelfde coil zitten
-   Met de dir kies je de richting, en door de step pin even hoog te zetten wordt er één stap gezet
+   Met de dir kies je de richting, en door de step pin even hoog te zetten wordt er één stap g
+   ezet
    Reset en sleep moeten aan elkaar doorverbonden zijn
    De enable pin moet aan begin high gemaakt worden, zodat de stappenmotor geen rare dingen gaat doen
    Rechtsom draaien op de stappenmotor drivers is het limiet van stroom hoger leggen, linksom lager
@@ -461,6 +462,7 @@ void loop() {
           if (afstandBoom < 200 && boomBezig == false){ // Als je een boom ziet die nog niet gezien is
             boomTeller++;
             dobeep(beepboom);
+            boomBezig = true;
           }
         
           if (afstandBoom > 200){ // Detecteer einde van een boom
@@ -546,7 +548,7 @@ void loop() {
           
             if (bochtStatus == 3){ // Zet bochtstappen tot aan de hoekverdraaiing, dat is einde van deze case
               bool temp = false;
-              while(temp){
+              while(!temp){
                 temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
                 aantalStappenR++;
               }
@@ -652,7 +654,7 @@ void loop() {
           
             if (bochtStatus == 3){ // Zet bochtstappen tot aan de hoekverdraaiing, dat is einde van deze case
             bool temp = false;
-            while(temp){
+            while(!temp){
               temp = bochtDingen(aantalStappenR - beginBochtStappen, 90);
               aantalStappenR++;
             }
@@ -692,12 +694,12 @@ void dobeep(int8_t beepkeuze){ // FIXED
       TimerFreeTone(muziekpin1, NOTE_B5, kwart);
     break;
 
-    /*
+    // /*
     case beepboom:
       TimerFreeTone(muziekpin1, NOTE_B5, half);
       delay(half);
     break;
-    */
+    // */
     
     case beepvolgaan:
       // beep beeeeeeeeeeeepppp
@@ -849,14 +851,14 @@ bool bochtDingen(uint16_t aantalStappenGedaan = 0, int16_t hoek = 90){
     return true;
   }
   
-  if (hoek > -100 && hoek > 0){
+  if (hoek > -100 && hoek < 0){
     digitalWrite(richtingPinL, LOW); // verkeerd om, daarom low
     digitalWrite(stapPinL, HIGH);
     delayMicroseconds(500);
     digitalWrite(stapPinL, LOW);
     delayMicroseconds(9500);
   }
-  else if (hoek < 100 && hoek < 0){
+  else if (hoek < 100 && hoek > 0){
     digitalWrite(richtingPinR, HIGH);
     digitalWrite(stapPinR, HIGH);
     delayMicroseconds(500);
